@@ -1,0 +1,47 @@
+4. Create Users
+User 1: rajecher
+Generate the key and certificate:
+
+openssl genrsa -out rajecher.key 2048
+openssl req -new -key rajecher.key -out rajecher.csr -subj "/CN=rajecher/O=clusteradmin"
+openssl x509 -req -in rajecher.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out rajecher.crt -days 365
+
+
+
+User 2: user2
+Generate the key and certificate:
+
+openssl genrsa -out user2.key 2048
+openssl req -new -key user2.key -out user2.csr -subj "/CN=user2/O=production"
+openssl x509 -req -in user2.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out user2.crt -days 365
+5. Copy Certificates and Keys
+Copy all .crt and .key files to the master root location safely.
+
+6. Create Config Files for Users
+For User 1:
+
+export KUBECONFIG=/root/USER1-CONFIG
+For User 2:
+
+export KUBECONFIG=/root/USER2-CONFIG
+7. Set Up RBAC Roles and Bindings
+Create roles and role bindings for the users, including:
+
+RoleBindings for namespace-specific permissions
+ClusterRoleBindings for cluster-wide permissions
+8. Admin User Configuration
+For the administrator rajecher:
+
+openssl genrsa -out rajecher.key 2048
+openssl req -new -key rajecher.key -out rajecher.csr -subj "/CN=rajecher/O=development"
+openssl x509 -req -in rajecher.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out rajecher.crt -days 365
+Copy all .crt and .key files to the master root location safely.
+
+Create the admin config file:
+
+export KUBECONFIG=/root/rajecher-CONFIG
+9. Merge Config Files
+To combine multiple config files into one:
+
+export KUBECONFIG=USER1-CONFIG:USER2-CONFIG:rajecher-CONFIG
+kubectl config view --merge --flatten > mixed-config.txt

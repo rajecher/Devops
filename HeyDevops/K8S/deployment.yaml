@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx-deployment
+  name: nginx-deployment
+  annotations:
+    info: "this is test deployment"
+    email: "rajesh@fdf.com"
+    owner: "rajesh"
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: nginx-deployment
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: nginx-deployment
+    spec:
+      containers:
+        - image: nginx:1.14.2
+          name: nginx
+        - image: kiran2361993/mydb:v1
+          name: mysqldb
+          env:
+            - name: DB_NAME
+              value: "mysqldb"
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_URL
+              value: "weewewe"

@@ -1,0 +1,33 @@
+pipeline{
+    agent any
+    stages{
+        stage ('curl'){
+            steps {
+                curl -I http://google.com 
+            }
+        }
+
+    }
+}
+
+
+pipeline {
+    agent any 
+    stages {
+        stage('Build') { 
+            steps {
+                // 
+            }
+        }
+        stage('Test') { 
+            steps {
+                // 
+            }
+        }
+        stage('Deploy') { 
+            steps {
+                // 
+            }
+        }
+    }
+}

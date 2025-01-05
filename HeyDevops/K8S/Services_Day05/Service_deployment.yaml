@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ingress-nginx-deployment
+  name: ingress-nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ingress-nginx-deployment
+  template:
+    metadata:
+      labels:
+        app: ingress-nginx-deployment
+    spec:
+      containers:
+        - image: kiran2361993/loadbalancerimage:v1
+          name: nginx
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-cluster-ip-service
+spec:
+  selector:
+    app: ingress-nginx-deployment
+  ports:
+    - port: 80
+      targetPort: 80

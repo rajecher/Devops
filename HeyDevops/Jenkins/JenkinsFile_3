@@ -1,0 +1,40 @@
+pipeline {
+    agent any 
+        stages{
+            stage ('http get'){
+                steps {
+                  curl -I 'google.com'
+
+                }
+                steps {
+                    curl -I 'gmail.com'
+                }
+            }
+        }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    

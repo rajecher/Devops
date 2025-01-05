@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: nginx-deployment
+  name: nginx-deployment-deamonset
+  annotations:
+    info: "this is test deployment"
+    email: "rajesh@fdf.com"
+    owner: "rajesh"
+spec:
+
+
+  selector:
+    matchLabels:
+      app: nginx-deployment
+
+  template:
+    metadata:
+      labels:
+        app: nginx-deployment
+    spec:
+      containers:
+        - image: kiran2361993/kubegame:v1
+          name: nginx
+        - image: kiran2361993/mydb:v1
+          name: mysqldb
