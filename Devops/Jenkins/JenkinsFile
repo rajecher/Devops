@@ -1,0 +1,16 @@
+pipleline {
+    agent any
+
+     stages{
+
+     stage ('Hello'){
+       
+       echo 'This is test'
+
+     }
+     stage ('This is second stage'){
+        echo 'This is second stage'
+     }
+    
+    }
+}

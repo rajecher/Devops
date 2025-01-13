@@ -1,0 +1,65 @@
+#openssl genrsa -out adam.key 2048
+#openssl req -new -key adam.key -out adam.csr -subj "/CN=adam
+#https://kubernetes.io/docs/reference/access-authn-authz/certificate-signing-requests/#create-certificatessigningrequest
+#kubectl certificate approve adam
+#kubectl get csr/adam -o yaml
+#kubectl get csr/adam -o yaml
+#kubectl get csr adam -o jsonpath='{.status.certificate}'
+#kubectl get csr adam -o jsonpath='{.status.certificate}'
+#kubectl get csr adam -o jsonpath='{.status.certificate}' | base64
+#kubectl get csr adam -o jsonpath='{.status.certificate}' | base64 -d /etc/kubernetes/pki/adam.crt
+#kubectl get csr adam -o jsonpath='{.status.certificate}' | base64 -d > /etc/kubernetes/pki/adam.crt
+
+#set credentials 
+#k config set-credentials adam --client-key ./adam.key --client-certificate ./adam.crt
+#k config get-clusters
+#k config set-context adam --cluster kubernetes --user adam
+#kubectl config use-context adam
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: adam
+spec:
+  request: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ1ZEQ0NBVHdDQVFBd0R6RU5NQXNHQTFVRUF3d0VZV1JoYlRDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRApnZ0VQQURDQ0FRb0NnZ0VCQUt6MWJOMndieGNyNnhpdkMyVFQ0ZDhTK0dybjlFcXhrdFRSQXRVZzY0RjdXYmhFCm5IWjlWUUdGd2VORjgvaFVPcFVkNFVUSXFaR0l3K2RhbmZlN0hVa1B0bWlLejJGWU5OS3hpQ0NKaDJkRXVZTVkKSVBlTUx5TklFYTBxajBEKzJyZFZVbWs4RDBMWmpneWtFV0NSM1FmbjF0cHRQM0c2a1B1ZkhCZWdCbk4yaWVleAprV1VVUGF2bGN0ZUM1bWdQVWR1RkIxSGxpUUptNmQ3R052bUNmM0tUM2F4NWt1WFp2ZEoxcVNLQ2l4cXNGaW9uCk0ycHFjd1Nub0crSDRSbGJUeGNSM1pMdW1GdjJXd1poemtvQnpWaVJNK3lSUjRXSTFjVUxQS1hrOVZUSnk2UDcKd1dKK2hpSTAzRkszcXB3UjljZzBxVDF0aTk0em9QWGg0ZE5VYThNQ0F3RUFBYUFBTUEwR0NTcUdTSWIzRFFFQgpDd1VBQTRJQkFRQWE3QzNyUUo0M0w2ZVZQYUNzTnIvNmoxQVplTkJVSTdEY09WdmRZMHUrcW9Fc0N2Z2RWNFdCCko2QlFoK2ZQRkY5L2V5bnArWTljbUd5OXR3bDhDNmRKZWkzY0xKMFV2Sk8vZ0ozTXFOUTYxRUJncStRTTgrb1gKUEdHMi9pTFdIOE90QWhLMUNVOVBINVp3ckU2ZkhqVHMvWGtRWnpaZ2tZaHVsSW5OY1ZaR0JJTjAzMXUzUlRyQgp1dDNKTFI3WENQSVh4Nk5vblhmM0VVZ3JSdGJtQzVOZU91Kzc5TFBLWXhzODhXZ1ZIMGpjR29TeHlHV0tSZ1RlClA1VkNQb2RSeXhqaTh1MVJ4QUNGdDFTNXdHSG5ZVklqcTZya0dPUk9uQUpGaE1Jd2ZCTitQQlB3eGcvbU1yYzMKdkNCVndFRFpYRk9CMmk4YWFCY2Uwd1BRbnlXT0xQa0QKLS0tLS1FTkQgQ0VSVElGSUNBVEUgUkVRVUVTVC0tLS0tCg==
+  signerName: kubernetes.io/kube-apiserver-client
+  expirationSeconds: 86400  # one day
+  usages:
+  - client auth
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+# This role binding allows "jane" to read pods in the "default" namespace.
+# You need to already have a Role named "pod-reader" in that namespace.
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: default
+subjects:
+# You can specify more than one "subject"
+- kind: User
+  name: adam # "name" is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  # "roleRef" specifies the binding to a Role / ClusterRole
+  kind: Role #this must be Role or ClusterRole
+  name: pod-reader # this must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io
+
+
+
+#validation 
+#k config  get-contexts 
+#controlplane ~ ➜  k auth whoami 
+#controlplane ~ ➜  kubectl get pods
+#controlplane ~ ➜  k get deployments

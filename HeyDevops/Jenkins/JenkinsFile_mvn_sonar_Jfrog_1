@@ -1,0 +1,81 @@
+pipeline {
+    agent any
+
+    stages {
+        stage ('Stage-1 CheckOut Code') {
+            steps {
+                // Get some code from a GitHub repository
+                git "https://github.com/rajecher/JavaApp.git"
+
+                // Run Maven on a Unix agent.
+                //  sh "mvn -Dmaven.test.failure.ignore=true clean package"
+
+                // To run Maven on a Windows agent, use
+                // bat "mvn -Dmaven.test.failure.ignore=true clean package"
+            }
+        }
+            stage ('Stage-2 Compile the code') {
+                steps {
+                    sh 'mvn compile'
+                    sh 'mvn test'
+
+                }
+            }
+
+            stage ('Stage -3 Create the build- With Sonar') {
+                steps {
+                    withSonarQubeEnv('My SonarQube Server'){
+                        sh 'mvn package sonar:sonar'
+
+                    }
+                    
+                }
+            }
+           
+            stage ('Artifactory'){
+                steps {
+                 rtUpload (
+               serverId: 'Jfrog-1',
+                spec: '''{
+                "files": [
+                {
+              "pattern": "/var/lib/jenkins/workspace/mvn/target/my-app-1.0-SNAPSHOT.jar",
+              "target": "Maven-Jar/"
+            }
+         ]
+    }''',
+
+    // Optional - Associate the uploaded files with the following custom build name and build number,
+    // as build artifacts.
+    // If not set, the files will be associated with the default build name and build number (i.e the 
+    // the Jenkins job name and number).
+    buildName: 'holyFrog',
+    buildNumber: '42',
+    // Optional - Only if this build is associated with a project in Artifactory, set the project key as follows.
+    project: 'my-project-key'
+)
+                }
+                
+            }
+
+                }
+            }
+
+            
+    
+            post {
+                // If Maven was able to run the tests, even if some of the test
+                // failed, record the test results and archive the jar file.
+                success {
+                    echo 'Job is sucess'
+
+                }
+                failure {
+                //Send email about the failure
+                emailext body: 'Jenkins build failed ', subject: 'Job failure ', to: 'rajecher@gmail.com'
+                echo 'Job failed '
+
+             }
+            }
+        
+    

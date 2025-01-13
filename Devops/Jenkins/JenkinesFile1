@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+    tools {
+        go 'go-1.17'
+        
+    }
+    environment {
+        GO111MODULE='on'
+    }
+    stages {
+        stage ('Development') {
+            steps {
+                git 'https://github.com/AdminTurnedDevOps/GoWebAPI.git'
+                sh 'go test ./...'
+
+            }
+        }
+        stage ('Create Image'){
+            steps {
+                script {
+                    app = docker.build ("adminturneddevops/go-webapp-sample")
+                }
+            }
+
+        }
+    }
+}

@@ -1,0 +1,7 @@
+# complete tls_csr_user.yaml
+# k api-resources --namespaced=true
+# k auth can-i get nodes
+
+#kubectl create clusterrole node-reader --verb=get,list,watch --resource=nodes
+# kubectl create clusterrolebinding reader-binding --clusterrole=node-reader --user=adam
+#kubectl auth can-i get nodes --as adam

@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+
+    stages {
+        stage ('Stage-1 CheckOut Code') {
+            steps {
+                // Get some code from a GitHub repository
+                git "https://github.com/rajecher/JavaApp.git"
+
+                // Run Maven on a Unix agent.
+                //  sh "mvn -Dmaven.test.failure.ignore=true clean package"
+
+                // To run Maven on a Windows agent, use
+                // bat "mvn -Dmaven.test.failure.ignore=true clean package"
+            }
+        }
+            stage ('Stage-2 Compile the code') {
+                steps {
+                    sh 'mvn compile'
+                    sh 'mvn test'
+
+                }
+            }
+
+            stage ('Stage -3 Create the build- With Sonar') {
+                steps {
+                    withSonarQubeEnv('My SonarQube Server'){
+                        sh 'mvn package sonar:sonar'
+
+                    }
+                    
+                }
+            }
+
+            
+    }
+            post {
+                // If Maven was able to run the tests, even if some of the test
+                // failed, record the test results and archive the jar file.
+                success {
+                    echo 'Job is sucess'
+
+                }
+                failure {
+                //Send email about the failure
+                emailext body: 'Jenkins build failed ', subject: 'Job failure ', to: 'rajecher@gmail.com'
+                echo 'Job failed '
+
+             }
+            }
+        }
+    
+
