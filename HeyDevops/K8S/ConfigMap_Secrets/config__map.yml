@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-cm
+data:
+  # property-like keys; each key maps to a simple value
+  db_port: "3306"
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx-deployment
+  name: nginx-deployment
+  annotations:
+    info: "this is test deployment"
+    email: "rajesh@fdf.com"
+    owner: "rajesh"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-deployment
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: nginx-deployment
+    spec:
+      containers:
+        
+        - image: abhishekf5/python-sample-app-demo:v1
+          name: python-app
+          env: 
+            - name: DB-PORT
+              valueFrom: 
+                configMapKeyRef: 
+                 name: test-cm
+                 key: db_port
+          ports:
+          - containerPort: 8000
+          
