@@ -4,7 +4,7 @@ metadata:
   name: test-cm
 data:
   # property-like keys; each key maps to a simple value
-  db_port: "3306"
+  db_port: "3307"
 
 ---
 
@@ -43,7 +43,5 @@ spec:
       - name: config-vol
         configMap:
           name: test-cm
-          items:
-          - key: log_level
-            path: log_level.conf
+
       
